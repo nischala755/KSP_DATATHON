@@ -59,3 +59,35 @@ def test_district_is_not_duplicated_as_station_without_station_cue():
     reconciled = reconcile_intent(provider_intent, "How many IPC 420 cases in Mysore?")
     assert reconciled.filters.district == "Mysuru"
     assert reconciled.filters.station is None
+
+
+def test_linked_cases_and_case_detail_workflow():
+    with TestClient(app) as client:
+        recent = client.get("/api/dashboard").json()["recent"]
+        assert recent
+        case_id = recent[0]["id"]
+        detail = client.get(f"/api/cases/{case_id}")
+        linked = client.get(f"/api/cases/{case_id}/similar")
+        assert detail.status_code == 200
+        assert detail.json()["id"] == case_id
+        assert linked.status_code == 200
+        assert linked.json()["source"]["id"] == case_id
+        assert isinstance(linked.json()["matches"], list)
+
+
+def test_fir_ingestion_confirmation_and_validation():
+    with TestClient(app) as client:
+        accepted = client.post(
+            "/api/ingest/scanned-fir",
+            data={"language": "kn"},
+            files={"file": ("sample.png", b"synthetic-image-content", "image/png")},
+        )
+        assert accepted.status_code == 200
+        assert accepted.json()["status"] == "confirmation_required"
+        assert accepted.json()["persisted"] is False
+        rejected = client.post(
+            "/api/ingest/scanned-fir",
+            data={"language": "auto"},
+            files={"file": ("unsafe.exe", b"not-a-scan", "application/octet-stream")},
+        )
+        assert rejected.status_code == 415

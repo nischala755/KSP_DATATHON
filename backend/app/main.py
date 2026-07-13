@@ -89,8 +89,15 @@ def dashboard(db: Session = Depends(get_db), user: User | None = Depends(current
 
 @app.post("/api/ingest/scanned-fir")
 async def ingest_scanned_fir(file: UploadFile = File(...), language: str = Form("auto")):
-    content = await file.read()
+    allowed_types = {"application/pdf", "image/png", "image/jpeg", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(415, "Only PDF, PNG, JPG, and WEBP FIR scans are supported")
+    if language not in {"auto", "en", "kn"}:
+        raise HTTPException(400, "Language must be auto, en, or kn")
+    content = await file.read(10 * 1024 * 1024 + 1)
     if not content: raise HTTPException(400, "Empty file")
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(413, "File exceeds the 10 MB upload limit")
     return {"status": "confirmation_required", "filename": file.filename, "language": language, "extracted": {"fir_number": None, "station": None, "narrative": "OCR/VLM adapter requires operator review before persistence."}, "persisted": False, "scope_note": "Demo stub: configure Pixtral or an approved Indic OCR service for extraction."}
 
 
@@ -112,4 +119,3 @@ if static_dir.exists():
         if full_path and requested.is_file() and static_dir.resolve() in requested.resolve().parents:
             return FileResponse(requested)
         return FileResponse(static_dir / "index.html")
-
