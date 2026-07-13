@@ -18,6 +18,18 @@ Official references:
 - `.dockerignore` excludes secrets, caches, databases, presentations and local build output.
 - The server listens on `X_ZOHO_CATALYST_LISTEN_PORT`, defaulting to 9000 locally.
 
+## Confirmed datathon project
+
+| Field | Value |
+|---|---|
+| Data center | India (`in`) |
+| Organization ID | `60077990572` |
+| Project ID | `51972000000013024` |
+| Current environment | Development |
+| Console route | `https://console.catalyst.zoho.in/baas/60077990572/project/51972000000013024/Development#/slate` |
+
+The console route is private administration UI and must not be submitted as the deployed solution link. The submission link must be the public AppSail endpoint created after deployment and production promotion.
+
 ## Step 1 — Create or open the qualifying Catalyst project
 
 1. Open `https://catalyst.zoho.com/promotions.html?cn=KSPH26`.
@@ -181,4 +193,3 @@ If the new deployment fails:
 4. Confirm required environment variables are present.
 5. Restore the last healthy AppSail deployment from the console.
 6. Do not delete a production project merely to fix a release.
-
