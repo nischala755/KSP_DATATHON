@@ -11,5 +11,6 @@ dist/
 .catalyst-build/
 *.oci.tar
 data/*.db
+backend/data/*.db
 data/generated/
 !data/.gitkeep

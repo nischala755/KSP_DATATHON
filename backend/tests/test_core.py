@@ -2,6 +2,8 @@ import os
 os.environ["DATABASE_URL"] = "sqlite:///./data/test_prahari.db"
 from fastapi.testclient import TestClient
 from app.main import app
+from app.intent_parser import reconcile_intent
+from app.schemas import Action, Intent, IntentFilters
 import re
 from uuid import uuid4
 
@@ -31,5 +33,29 @@ def test_kannada_and_similarity():
         response = client.post("/api/chat", json={"message": "ಮೈಸೂರು ಜಿಲ್ಲೆಯಲ್ಲಿ ಎಷ್ಟು ಪ್ರಕರಣಗಳು?", "conversation_id": "kn"})
         assert response.status_code == 200
         assert response.json()["intent"]["language"] == "kn"
+        assert response.json()["intent"]["filters"]["district"] == "Mysuru"
+        assert response.json()["citations"]
         similar = client.get("/api/cases/FIR-2023-0018/similar")
         assert similar.status_code in (200, 404)
+
+
+def test_provider_omission_is_reconciled_from_explicit_query():
+    provider_intent = Intent(
+        filters=IntentFilters(ipc_section="420"),
+        requested_action=Action.aggregate,
+        language="en",
+    )
+    reconciled = reconcile_intent(provider_intent, "How many IPC 420 cases in Mysore?")
+    assert reconciled.filters.district == "Mysuru"
+    assert reconciled.filters.ipc_section == "420"
+
+
+def test_district_is_not_duplicated_as_station_without_station_cue():
+    provider_intent = Intent(
+        filters=IntentFilters(district="Mysore", station="Mysore", ipc_section="420"),
+        requested_action=Action.aggregate,
+        language="en",
+    )
+    reconciled = reconcile_intent(provider_intent, "How many IPC 420 cases in Mysore?")
+    assert reconciled.filters.district == "Mysuru"
+    assert reconciled.filters.station is None
