@@ -3,6 +3,7 @@ os.environ["DATABASE_URL"] = "sqlite:///./data/test_prahari.db"
 from fastapi.testclient import TestClient
 from app.main import app
 from app.intent_parser import reconcile_intent
+from app.ocr import _fallback_fields
 from app.schemas import Action, Intent, IntentFilters
 import re
 from uuid import uuid4
@@ -75,7 +76,26 @@ def test_linked_cases_and_case_detail_workflow():
         assert isinstance(linked.json()["matches"], list)
 
 
-def test_fir_ingestion_confirmation_and_validation():
+def test_fir_ingestion_confirmation_and_validation(monkeypatch):
+    async def fake_ocr(content, content_type, language):
+        assert content == b"synthetic-image-content"
+        assert content_type == "image/png"
+        return {
+            "language": "kn" if language == "kn" else "en",
+            "extracted": {
+                "fir_number": "FIR-DEMO-2026-0002",
+                "station": "Demo Nagar PS",
+                "district": "Mysuru",
+                "date": "13 July 2026",
+                "sections": ["379"],
+                "complainant": "Fictional Citizen B",
+                "narrative": "Synthetic training record.",
+                "raw_text": "SYNTHETIC DEMO",
+            },
+            "ocr": {"provider": "mistral", "model": "mistral-ocr-latest", "pages": 1, "average_confidence": 0.98},
+        }
+
+    monkeypatch.setattr("app.main.ocr_fir_document", fake_ocr)
     with TestClient(app) as client:
         accepted = client.post(
             "/api/ingest/scanned-fir",
@@ -85,9 +105,27 @@ def test_fir_ingestion_confirmation_and_validation():
         assert accepted.status_code == 200
         assert accepted.json()["status"] == "confirmation_required"
         assert accepted.json()["persisted"] is False
+        assert accepted.json()["extracted"]["fir_number"] == "FIR-DEMO-2026-0002"
+        assert accepted.json()["ocr"]["provider"] == "mistral"
         rejected = client.post(
             "/api/ingest/scanned-fir",
             data={"language": "auto"},
             files={"file": ("unsafe.exe", b"not-a-scan", "application/octet-stream")},
         )
         assert rejected.status_code == 415
+
+
+def test_ocr_markdown_table_fallback_extracts_review_fields():
+    markdown = """
+| FIR ID | FIR-DEMO-2026-0001 |
+| Police Station | Demo Nagar Central PS |
+| District | Mysuru |
+| Date | 13 July 2026 |
+| Sections | IPC 379 |
+| Complainant | Fictional Citizen A |
+"""
+    fields = _fallback_fields(markdown)
+    assert fields["fir_number"] == "FIR-DEMO-2026-0001"
+    assert fields["station"] == "Demo Nagar Central PS"
+    assert fields["district"] == "Mysuru"
+    assert fields["sections"] == ["IPC 379"]

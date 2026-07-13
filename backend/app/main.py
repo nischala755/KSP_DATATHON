@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 import os
+import httpx
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -12,6 +13,7 @@ from .config import get_settings
 from .database import Base, SessionLocal, engine, get_db
 from .intent_parser import get_provider
 from .models import AuditLog, FirRecord, User
+from .ocr import OCRConfigurationError, ocr_fir_document
 from .retrieval import retrieve, similar_cases
 from .schemas import ChatRequest, ChatResponse, Citation
 from .seed import seed_database
@@ -98,7 +100,21 @@ async def ingest_scanned_fir(file: UploadFile = File(...), language: str = Form(
     if not content: raise HTTPException(400, "Empty file")
     if len(content) > 10 * 1024 * 1024:
         raise HTTPException(413, "File exceeds the 10 MB upload limit")
-    return {"status": "confirmation_required", "filename": file.filename, "language": language, "extracted": {"fir_number": None, "station": None, "narrative": "OCR/VLM adapter requires operator review before persistence."}, "persisted": False, "scope_note": "Demo stub: configure Pixtral or an approved Indic OCR service for extraction."}
+    try:
+        result = await ocr_fir_document(content, file.content_type, language)
+    except OCRConfigurationError as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(502, f"Mistral OCR request failed with status {exc.response.status_code}") from exc
+    except (httpx.HTTPError, ValueError) as exc:
+        raise HTTPException(502, "Mistral OCR could not process this document") from exc
+    return {
+        "status": "confirmation_required",
+        "filename": file.filename,
+        **result,
+        "persisted": False,
+        "scope_note": "Mistral OCR extraction completed. An authorized operator must verify every field before persistence.",
+    }
 
 
 # AppSail deployment serves the compiled React client from the same origin as
