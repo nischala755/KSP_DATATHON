@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.agents/
+.codex/
+.venv/
+node_modules/
+dist/
+*.tsbuildinfo
+data/*.db
+data/generated/
+!data/.gitkeep
