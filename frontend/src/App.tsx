@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Activity, BadgeCheck, BarChart3, ChevronRight, CircleUserRound, FileSearch, Fingerprint, Languages, LayoutDashboard, Link2, LockKeyhole, MapPin, Menu, Mic, Send, ShieldCheck, Sparkles } from 'lucide-react'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '')
 type Citation={record_id:string;fir_number:string;district:string;station:string}
 type Message={side:'user'|'ai';text:string;citations?:Citation[];confidence?:string;auditId?:number}
 type Dashboard={total_visible:number;by_district:{district:string;count:number}[];recent:any[];fairness_note:string}
@@ -39,4 +39,3 @@ function App(){
 
 function DashboardView({data}:{data:Dashboard|null}){return <section className="dashboard"><div className="fairness"><ShieldCheck/><div><b>Ethical analytics by design</b><span>{data?.fairness_note||'PRAHARI displays area aggregates only — never individual risk scores.'}</span></div></div><div className="stats"><article><span>Visible records</span><strong>{data?.total_visible||'—'}</strong><small>Within current jurisdiction</small></article><article><span>Active districts</span><strong>{data?.by_district.length||'—'}</strong><small>Aggregated case coverage</small></article><article><span>Audit integrity</span><strong>100%</strong><small>Verified interaction chain</small></article></div><div className="dash-grid"><div className="panel"><div className="panel-title"><div><span className="eyebrow">Area-level distribution</span><h2>Cases by district</h2></div><MapPin/></div><div className="bars">{data?.by_district.slice(0,8).map((d,i)=><div className="bar-row" key={d.district}><span>{d.district}</span><div><i style={{width:`${Math.max(16,d.count/Math.max(...data.by_district.map(x=>x.count))*100)}%`}}/></div><b>{d.count}</b></div>)}</div></div><div className="panel"><div className="panel-title"><div><span className="eyebrow">Latest intelligence</span><h2>Recent FIRs</h2></div><FileSearch/></div>{data?.recent.map(r=><div className="recent" key={r.id}><span>{r.id.slice(-4)}</span><div><b>{r.fir_number}</b><small>{r.station} · {r.district}</small></div><em>{r.status}</em></div>)}</div></div></section>}
 export default App
-

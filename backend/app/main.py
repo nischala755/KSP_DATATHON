@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import os
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -91,4 +92,24 @@ async def ingest_scanned_fir(file: UploadFile = File(...), language: str = Form(
     content = await file.read()
     if not content: raise HTTPException(400, "Empty file")
     return {"status": "confirmation_required", "filename": file.filename, "language": language, "extracted": {"fir_number": None, "station": None, "narrative": "OCR/VLM adapter requires operator review before persistence."}, "persisted": False, "scope_note": "Demo stub: configure Pixtral or an approved Indic OCR service for extraction."}
+
+
+# AppSail deployment serves the compiled React client from the same origin as
+# the API. API routes remain registered first, so the SPA fallback cannot
+# shadow them.
+static_dir = Path(os.getenv("PRAHARI_STATIC_DIR", "frontend_dist"))
+if static_dir.exists():
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    assets_dir = static_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def frontend_spa(full_path: str):
+        requested = static_dir / full_path
+        if full_path and requested.is_file() and static_dir.resolve() in requested.resolve().parents:
+            return FileResponse(requested)
+        return FileResponse(static_dir / "index.html")
 

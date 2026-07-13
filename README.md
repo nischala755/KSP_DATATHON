@@ -963,6 +963,15 @@ Ensure Docker Desktop is running and that the current Windows user can read the 
 
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the critical design rationale behind constrained intents, aggregate-only analytics, similarity explanations, and audit/PQC boundaries.
 
+## Datathon submission package
+
+The teammate-ready submission material is organized under [`deliverables/`](deliverables/):
+
+- [`01_presentation_template`](deliverables/01_presentation_template/) contains the original KSP Datathon PPTX, exact content for all 16 slides, speaker notes, visual-design guidance, extracted template artwork, and four editable SVG diagrams/charts.
+- [`02_prototype_and_deployment`](deliverables/02_prototype_and_deployment/) explains the complete idea, provides a three-minute demo and judge Q&A script, documents the AppSail deployment workflow, and includes the final submission checklist.
+
+The qualifying Catalyst container is defined by [`Dockerfile.catalyst`](Dockerfile.catalyst). It compiles React and serves it from the FastAPI process on Catalyst's `X_ZOHO_CATALYST_LISTEN_PORT`, producing one same-origin AppSail link. The Linux AMD64 image has been built and smoke-tested locally; remote deployment requires an authenticated promotion-linked Catalyst project.
+
 ---
 
 <div align="center">
