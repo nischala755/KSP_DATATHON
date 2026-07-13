@@ -17,6 +17,7 @@ Official references:
 - The frontend uses same-origin API URLs in production.
 - `.dockerignore` excludes secrets, caches, databases, presentations and local build output.
 - The server listens on `X_ZOHO_CATALYST_LISTEN_PORT`, defaulting to 9000 locally.
+- The AppSail image intentionally omits a numeric OCI `USER`; Catalyst's bundle creator rejects numeric user IDs and applies its runtime isolation itself.
 
 ## Confirmed datathon project
 
@@ -27,8 +28,25 @@ Official references:
 | Project ID | `51972000000013024` |
 | Current environment | Development |
 | Console route | `https://console.catalyst.zoho.in/baas/60077990572/project/51972000000013024/Development#/slate` |
+| AppSail service ID | `51972000000017001` |
+| Verified Development URL | `https://prahari-50043921178.development.catalystappsail.in` |
 
 The console route is private administration UI and must not be submitted as the deployed solution link. The submission link must be the public AppSail endpoint created after deployment and production promotion.
+
+## Verified deployment record — 13 July 2026
+
+The `prahari` custom-runtime service is deployed and active in Development. Public verification returned:
+
+| Check | Result |
+|---|---|
+| React homepage | HTTP 200 |
+| FastAPI documentation | HTTP 200 |
+| Health | `status=ok`, `cases=500` |
+| Grounded Mysuru IPC 420 query | 9 matching records, high confidence |
+| Returned citation objects | 8 |
+| Audit chain | 1 entry, verified |
+
+The first OCI deployment failed because Catalyst's bundle creator rejected `USER 10001` with `Invalid user id in config: 10001`. The corrected image omits the numeric OCI `USER`, relies on Catalyst runtime isolation, and deployed successfully from a pure OCI archive.
 
 ## Step 1 — Create or open the qualifying Catalyst project
 

@@ -14,6 +14,8 @@
 
 Built as a decision-support prototype for the **SCRB Karnataka Datathon**.
 
+**Live Catalyst AppSail deployment:** [https://prahari-50043921178.development.catalystappsail.in](https://prahari-50043921178.development.catalystappsail.in)
+
 </div>
 
 ---
@@ -971,6 +973,8 @@ The teammate-ready submission material is organized under [`deliverables/`](deli
 - [`02_prototype_and_deployment`](deliverables/02_prototype_and_deployment/) explains the complete idea, provides a three-minute demo and judge Q&A script, documents the AppSail deployment workflow, and includes the final submission checklist.
 
 The qualifying Catalyst container is defined by [`Dockerfile.catalyst`](Dockerfile.catalyst). It compiles React and serves it from the FastAPI process on Catalyst's `X_ZOHO_CATALYST_LISTEN_PORT`, producing one same-origin AppSail link. The Linux AMD64 image has been built and smoke-tested locally; remote deployment requires an authenticated promotion-linked Catalyst project.
+
+The Development AppSail endpoint is deployed and verified. Before final evaluation, use the Catalyst console's **Deploy to Production** workflow and replace the development link with the resulting production endpoint if the submission rules require production rather than a publicly accessible Development deployment.
 
 ---
 

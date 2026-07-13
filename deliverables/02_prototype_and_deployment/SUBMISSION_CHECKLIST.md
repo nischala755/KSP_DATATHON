@@ -15,7 +15,7 @@
 
 - [x] Public GitHub repository: `https://github.com/nischala755/KSP_DATATHON`
 - [ ] Three-minute demo video uploaded and publicly viewable
-- [ ] Catalyst development URL tested in an incognito browser
+- [x] Catalyst development URL tested over the public network
 - [ ] Catalyst production URL created from the console
 - [ ] Final production URL placed on slide 13
 - [ ] API `/health` and app homepage tested after production promotion
@@ -35,7 +35,6 @@
 - [x] Frontend production build passes
 - [x] Local 50-request benchmark recorded
 - [ ] AppSail logs show healthy startup
-- [ ] Live `/api/health` reports 500 seeded cases
-- [ ] Live chat returns grounded citations
-- [ ] Live audit chain verifies
-
+- [x] Live `/api/health` reports 500 seeded cases
+- [x] Live chat returns grounded citations
+- [x] Live audit chain verifies

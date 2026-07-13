@@ -325,8 +325,8 @@ Use `visuals/03_benchmark_chart.svg`.
 
 - GitHub public repository: `https://github.com/nischala755/KSP_DATATHON`
 - Demo video, 3 minutes: `{TEAM INPUT — add final public video URL}`
-- Deployed Catalyst link: `{PENDING CATALYST LOGIN AND DEPLOYMENT}`
-- Optional API docs: `{LIVE_CATALYST_URL}/docs`
+- Deployed Catalyst AppSail link: `https://prahari-50043921178.development.catalystappsail.in`
+- Live API docs: `https://prahari-50043921178.development.catalystappsail.in/docs`
 
 ### QR codes
 
@@ -334,7 +334,7 @@ Add three QR codes: GitHub, video and live app. Test every QR code on a phone be
 
 ### Submission check
 
-The live URL must be a Zoho Catalyst/AppSail endpoint and must remain accessible without a developer machine running.
+The verified link is a Zoho Catalyst AppSail Development endpoint and remains accessible without a developer machine running. Replace it with the production endpoint after using **Deploy to Production** in the Catalyst console if production promotion is required before submission.
 
 ## Slide 14 — Future development
 
@@ -401,4 +401,3 @@ Retain the supplied template visual.
 ### Final spoken close
 
 “PRAHARI demonstrates that conversational AI can be useful in policing without giving up evidence, jurisdiction, explainability or accountability.”
-

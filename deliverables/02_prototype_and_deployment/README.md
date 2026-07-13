@@ -15,7 +15,7 @@ This folder explains the product from first principles and provides the Catalyst
 - Single-origin React + FastAPI container: implemented in `Dockerfile.catalyst`
 - Catalyst CLI: must be installed and authenticated
 - Catalyst project association: requires a teammate's Catalyst account
-- Live solution URL: pending deployment
+- Live Development solution URL: `https://prahari-50043921178.development.catalystappsail.in`
+- Live verification: homepage, health, grounded chat, citations and audit chain passed
 
-The live URL cannot be created without an authenticated Catalyst project. Never share a Zoho password or browser session; complete `catalyst login` interactively.
-
+Production promotion remains a console action. Never share a Zoho password, browser session, token or OTP.
